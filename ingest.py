@@ -36,16 +36,19 @@ def main():
     data = get_tefas_data(args.date)
 
     # Delete existing records
-    res = supabase.table("prices").select("*").eq("date", date).execute()
+    res = supabase.table("prices").select("*").eq("date", args.date).execute()
+    print(f"Found {len(res['data'])} existing records for date={args.date}")
     if res["data"]:
         # Pass JSONDecodeError silently because of a bug in supabase-py
         # https://github.com/supabase/supabase-py/issues/22
+        print("Deleting existing records")
         try:
-            supabase.table("prices").delete().eq("date", date).execute()
+            supabase.table("prices").delete().eq("date", args.date).execute()
         except JSONDecodeError:
             pass
 
     # Insert new records
+    print("Inserting rew records")
     supabase.table("prices").insert(data).execute()
 
 
